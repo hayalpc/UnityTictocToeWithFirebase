@@ -3,22 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 public class RoomData : Singleton<RoomData>
 {
     public string RoomId { get; set; }
     public string PlayerId { get; set; }
 
-    private string _otherPlayerId { get; set; }
-    public string OtherPlayerId
+    private string _otherUserId { get; set; }
+    public string OtherUserId
     {
         get
         {
-            return _otherPlayerId;
+            return _otherUserId;
         }
         set
         {
-            _otherPlayerId = value;
+            _otherUserId = value;
         }
     }
     private string _otherUsername { get; set; }
@@ -31,6 +32,17 @@ public class RoomData : Singleton<RoomData>
         set
         {
             _otherUsername = value;
+            if (UserData.Instance.GameState == GameState.Gameplay)
+            {
+                if (PlayerId == "PlayerA")
+                {
+                    FindObjectOfType<Gameplay>().playerBUsername.text = OtherUsername;
+                }
+                if (PlayerId == "PlayerB")
+                {
+                    FindObjectOfType<Gameplay>().playerAUsername.text = OtherUsername;
+                }
+            }
         }
     }
     private int _otherScore { get; set; }
@@ -43,6 +55,17 @@ public class RoomData : Singleton<RoomData>
         set
         {
             _otherScore = value;
+            if (UserData.Instance.GameState == GameState.Gameplay)
+            {
+                if (PlayerId == "PlayerA")
+                {
+                    FindObjectOfType<Gameplay>().playerBScore.text = OtherScore.ToString();
+                }
+                if (PlayerId == "PlayerB")
+                {
+                    FindObjectOfType<Gameplay>().playerAScore.text = OtherScore.ToString();
+                }
+            }
         }
     }
 
@@ -56,6 +79,16 @@ public class RoomData : Singleton<RoomData>
         set
         {
             _turn = value;
+            if (value == "PlayerA" && UserData.Instance.GameState == GameState.Gameplay)
+            {
+                FindObjectOfType<Gameplay>().playerATurn.enabled = true;
+                FindObjectOfType<Gameplay>().playerBTurn.enabled = false;
+            }
+            if (value == "PlayerB" && UserData.Instance.GameState == GameState.Gameplay)
+            {
+                FindObjectOfType<Gameplay>().playerATurn.enabled = false;
+                FindObjectOfType<Gameplay>().playerBTurn.enabled = true;
+            }
         }
     }
 
@@ -68,7 +101,34 @@ public class RoomData : Singleton<RoomData>
         }
         set
         {
-            _result = value;
+            if (_result != value)
+            {
+                _result = value;
+                if (value == "PlayerA" && UserData.Instance.GameState == GameState.Gameplay)
+                {
+                    if (PlayerId == "PlayerA")
+                    {
+                        Debug.Log("Kazandın!");
+                    }
+                    else
+                    {
+                        Debug.Log("Kaybettin!");
+                    }
+                    DBManager.Instance.FinishGame();
+                }
+                else if (value == "PlayerB" && UserData.Instance.GameState == GameState.Gameplay)
+                {
+                    if (PlayerId == "PlayerB")
+                    {
+                        Debug.Log("Kazandın!");
+                    }
+                    else
+                    {
+                        Debug.Log("Kaybettin!");
+                    }
+                    DBManager.Instance.FinishGame();
+                }
+            }
         }
     }
 
@@ -83,7 +143,15 @@ public class RoomData : Singleton<RoomData>
         }
         set
         {
-            _playerAReady = value;
+            if (_playerAReady != value)
+            {
+                _playerAReady = value;
+                if (value == true && UserData.Instance.GameState == GameState.Transaction)
+                {
+                    FindObjectOfType<Transaction>().playerAReadyText.text = "PlayerA Hazır!";
+                    FindObjectOfType<Transaction>().playerAReadyText.color = new Color32(65, 203, 41, 255);
+                }
+            }
         }
     }
 
@@ -96,7 +164,15 @@ public class RoomData : Singleton<RoomData>
         }
         set
         {
-            _playerBReady = value;
+            if (_playerBReady != value)
+            {
+                _playerBReady = value;
+                if (value == true && UserData.Instance.GameState == GameState.Transaction)
+                {
+                    FindObjectOfType<Transaction>().playerBReadyText.text = "PlayerB Hazır!";
+                    FindObjectOfType<Transaction>().playerBReadyText.color = new Color32(65, 203, 41, 255);
+                }
+            }
         }
     }
 }

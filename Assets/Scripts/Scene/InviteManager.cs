@@ -1,18 +1,35 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InviteManager : MonoBehaviour
 {
-    // Start is called before the first frame update
+    DBManager DB;
+
+    public Text inviteMessage;
+
+    public Button acceptInvite;
+    public Button rejectInvite;
+
+    public string otherUserId;
+
     void Start()
     {
-        
+        DB = DBManager.Instance;
+
+        acceptInvite.onClick.AddListener(AcceptInvite);
+        rejectInvite.onClick.AddListener(RejectInvite);
     }
 
-    // Update is called once per frame
-    void Update()
+    void AcceptInvite()
     {
-        
+        DB.AcceptInvite(otherUserId);
     }
+
+    void RejectInvite()
+    {
+        gameObject.GetComponent<RectTransform>().sizeDelta = Vector2.zero;
+    }
+
 }
